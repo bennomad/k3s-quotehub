@@ -38,6 +38,15 @@ docker build -t <user>/nginx-web:v1 ./nginx
 docker push <user>/nginx-web:v1
 ```
 
+### Create Docker Registry Secret
+```bash
+kubectl create secret docker-registry regcred \
+  --docker-server=https://index.docker.io/v1/ \
+  --docker-username=dockeruser \
+  --docker-password=dockerpassword \
+  --docker-email=dockermail
+```
+
 ### Deploy to Cluster
 ```bash
 # Export env vars from .env (required for envsubst in YAMLs)
