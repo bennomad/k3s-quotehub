@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-api
+  namespace: quotehub
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: quote-api
+  template:
+    metadata:
+      labels:
+        app: quote-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: api
+        image: ${QUOTE_API_IMAGE}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quote-api
+  namespace: quotehub
+spec:
+  selector:
+    app: quote-api
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP 
