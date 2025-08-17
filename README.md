@@ -30,6 +30,11 @@ k3sup install --ip <master-ip> --user root
 k3sup join --ip <worker-ip> --server-ip <master-ip> --user root
 ```
 
+### Set Default Namespace
+```bash
+kubectl config set-context --current --namespace=quotehub
+```
+
 ### Export GitHub Environment Variables
 ```bash
 export GITHUB_TOKEN=ghp_your_token_here
@@ -52,7 +57,7 @@ docker push ghcr.io/$GITHUB_USERNAME/nginx-web:v1
 ```bash
 kubectl create secret docker-registry regcred \
   --docker-server=ghcr.io \
-  --docker-username=USERNAME \
+  --docker-username=$GITHUB_USERNAME \
   --docker-password=$GITHUB_TOKEN \
   --docker-email=your-email@example.com
 ```
