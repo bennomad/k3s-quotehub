@@ -11,7 +11,7 @@
 | Kubernetes    | k3s on DigitalOcean              |
 | Backend       | Python Flask + Gunicorn          |
 | Frontend      | Nginx (static + reverse proxy)   |
-| Images        | Docker, pushed to Docker Hub     |
+| Images        | Docker, pushed to GitHub Container Registry |
 | Access        | kubectl + k3sup                  |
 
 ---
@@ -30,21 +30,31 @@ k3sup install --ip <master-ip> --user root
 k3sup join --ip <worker-ip> --server-ip <master-ip> --user root
 ```
 
-### Build & Push Images
+### Export GitHub Environment Variables
 ```bash
-docker build -t <user>/quote-api:v1 ./api
-docker push <user>/quote-api:v1
-docker build -t <user>/nginx-web:v1 ./nginx
-docker push <user>/nginx-web:v1
+export GITHUB_TOKEN=ghp_your_token_here
+export GITHUB_USERNAME=your_github_username
 ```
 
-### Create Docker Registry Secret
+### Build & Push Images
+```bash
+# Login to GitHub Container Registry
+echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
+
+# Build and tag for GitHub Container Registry
+docker build -t ghcr.io/$GITHUB_USERNAME/quote-api:v1 ./api
+docker push ghcr.io/$GITHUB_USERNAME/quote-api:v1
+docker build -t ghcr.io/$GITHUB_USERNAME/nginx-web:v1 ./nginx
+docker push ghcr.io/$GITHUB_USERNAME/nginx-web:v1
+```
+
+### Create GitHub Container Registry Secret
 ```bash
 kubectl create secret docker-registry regcred \
-  --docker-server=https://index.docker.io/v1/ \
-  --docker-username=dockeruser \
-  --docker-password=dockerpassword \
-  --docker-email=dockermail
+  --docker-server=ghcr.io \
+  --docker-username=USERNAME \
+  --docker-password=$GITHUB_TOKEN \
+  --docker-email=your-email@example.com
 ```
 
 ### Deploy to Cluster
@@ -95,5 +105,5 @@ This project wasn't just a clean deploy — it involved realistic debugging and 
 * **Validated intra-cluster DNS and service discovery**
   → Used `kubectl exec` with `curl` inside Nginx pods to confirm backend API worked independently of ingress issues.
 
-* **Docker Hub authentication issues (Pods couldn't pull images due to missing login)**
-  → Fixed by creating a Docker registry secret with `kubectl create secret docker-registry` and referencing it in the deployment YAML to allow authenticated image pulls.
+* **GitHub Container Registry authentication issues (Pods couldn't pull images due to missing login)**
+  → Fixed by creating a GitHub Container Registry secret with `kubectl create secret docker-registry` and referencing it in the deployment YAML to allow authenticated image pulls.
