@@ -28,10 +28,9 @@ metadata:
   name: nginx-web
   namespace: quotehub
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: nginx-web
   ports:
   - port: 80
-    targetPort: 80
-    nodePort: 32080 
+    targetPort: 80 

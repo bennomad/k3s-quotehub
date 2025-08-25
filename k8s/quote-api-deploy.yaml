@@ -38,9 +38,15 @@ spec:
               name: mariadb-secret
               key: MARIADB_DATABASE
         - name: MARIADB_HOST
-          value: "mariadb.quotehub.svc.cluster.local"
+          valueFrom:
+            configMapKeyRef:
+              name: mariadb-config
+              key: MARIADB_HOST
         - name: MARIADB_PORT
-          value: "3306"
+          valueFrom:
+            configMapKeyRef:
+              name: mariadb-config
+              key: MARIADB_PORT
 ---
 apiVersion: v1
 kind: Service

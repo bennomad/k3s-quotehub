@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-config
+  namespace: quotehub
+data:
+  MARIADB_HOST: "mariadb.quotehub"
+  MARIADB_PORT: "3306" 

@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: quotehub-ingress
+  namespace: quotehub
+  annotations:
+    # Enable SSL redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    
+    # Enable cert-manager automatic SSL certificates
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/tls-acme: "true"
+    
+    # Handle client IP forwarding
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+spec:
+  # Use nginx ingress controller (modern way)
+  ingressClassName: nginx
+  # SSL/TLS configuration
+  tls:
+  - hosts:
+    - ${DOMAIN}
+    secretName: ${DOMAIN}-tls
+  
+  rules:
+  - host: ${DOMAIN}
+    http:
+      paths:
+      # API routes
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: quote-api
+            port:
+              number: 5000
+      # Frontend routes (nginx static files + fallback)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-web
+            port:
+              number: 80 
